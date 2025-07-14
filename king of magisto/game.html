@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>King of Magisto - The Hunt</title>
+  <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English+SC&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'IM Fell English SC', serif;
+      background: url('hut in the forest.jpg') no-repeat center center fixed;
+      background-size: cover;
+      color: #3b2f1d;
+      font-size: 20px;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+
+    .hud {
+      background-color: rgba(255, 248, 220, 0.85);
+      border-bottom: 2px solid #5e4b2b;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .main {
+      flex: 1;
+      display: flex;
+      padding: 20px;
+      gap: 20px;
+    }
+
+    .narrative {
+      flex: 3;
+      background-color: rgba(255, 248, 220, 0.9);
+      border: 2px solid #5e4b2b;
+      border-radius: 10px;
+      padding: 20px;
+      min-height: 300px;
+    }
+
+    .inventory {
+      flex: 1;
+      background-color: rgba(255, 248, 220, 0.9);
+      border: 2px solid #5e4b2b;
+      border-radius: 10px;
+      padding: 15px;
+      max-width: 300px;
+    }
+
+    .footer {
+      background-color: rgba(255, 248, 220, 0.9);
+      border-top: 2px solid #5e4b2b;
+      padding: 10px;
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      
+    }
+
+    button {
+      font-family: 'IM Fell English SC', serif;
+      background-color: #d2b48c;
+      border: 2px solid #5e4b2b;
+      border-radius: 5px;
+      padding: 8px 16px;
+      cursor: pointer;
+      color: #3b2f1d;
+      font-size: 20px;
+      transition: background-color 0.3s ease;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    button:hover:enabled {
+      background-color: #e0c9a6;
+    }
+
+    .screen {
+      display: none;
+      flex-direction: column;
+      padding: 20px;
+    }
+
+    .active {
+      display: flex;
+    }
+
+    #storeScreen {
+      margin-top: 20px;
+      border: 2px solid #5e4b2b;
+      background-color: rgba(255, 248, 220, 0.9);
+      border-radius: 10px;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      max-width: 400px;
+    }
+
+    #storeDialogue {
+      min-height: 80px;
+      margin-bottom: 10px;
+      font-style: italic;
+    }
+
+    #storeButtons button {
+      margin-right: 10px;
+      margin-bottom: 10px;
+    }
+ #roadScreen {
+  background: url('backgroundroad.jpg.png') no-repeat center center;
+  background-size: cover;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  color: white; /* Text color */
+  position: relative;
+}
+
+/* Add a semi-transparent background box behind the text */
+#roadScreen > * {
+  background-color: rgba(0, 0, 0, 0.5); /* black with 50% opacity */
+  padding: 15px;
+  border-radius: 8px;
+  max-width: 600px; /* optional, to limit width */
+}
+
+#townScreen {
+  min-height: 100vh; /* Full height of the viewport */
+  background: url('background.jpg.png') no-repeat center center;
+  background-size: cover;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+
+  </style>
+</head>
+<body>
+
+  <div id="mainScreen" class="screen active">
+    <div class="hud">
+      <div>🗓️ Day: <span id="day">1</span></div>
+      <div>❤️ Health: <span id="health">100</span></div>
+      <div>🍗 Food: <span id="food">4</span></div>
+      <div>🪙 Coins: <span id="coins">0</span></div>
+      <div>⚡ Energy: <span id="energy">5</span></div>
+    </div>
+
+    <div class="main">
+      <div class="narrative">
+        <div id="story">
+          🌲 The woods are silent. You hear rustling beyond the clearing. A rabbit darts between the roots.<br /><br />
+          What do you do?
+        </div>
+        <br />
+        <button id="huntBtn">→ Draw your bow (D)</button>
+        <button id="checkBtn">→ Check surroundings (C)</button>
+      </div>
+
+      <div class="inventory">
+        <h3>🎒 Inventory</h3>
+        <p>🍗 Food: <span id="invFood">4</span></p>
+        <p>🌿 Herbs: <span id="herbs">0</span></p>
+        <p>🏹 Arrows: <span id="arrows">10</span></p>
+        <p>🧪 Potion: None</p>
+      </div>
+    </div>
+
+    <div class="footer">
+      <button id="restBtn">🛌 Rest</button>
+      <button id="goToRoadBtn">🛣️ Go to Road</button>
+      <button disabled>🗺️ Map (Locked)</button>
+      <button id="logBtn">📖 Story Log</button>
+      <button onclick="saveGame()">💾 Save</button>
+<button onclick="loadGame()">📂 Load</button>
+
+    </div>
+  </div>
+
+  <!-- Road Screen -->
+  <div id="roadScreen" class="screen">
+    <h2>🛣️ The Road</h2>
+    <p>You stand at a fork in the road. One path leads to the town Stonewell.</p>
+    <button id="goToTownBtn">→ Head to Stonewell</button>
+    <button id="backToMainBtn">← Back to Wilderness</button>
+  </div>
+
+  <!-- Town Screen -->
+  <div id="townScreen" class="screen">
+    <h2>🏘️ Stonewell Town</h2>
+    <p>The town bustles with activity. What do you do?</p>
+    <button id="backToRoadBtn">← Back to Road</button>
+
+    <!-- Store Section -->
+    <div id="storeScreen" style="display:none;">
+      <h3>🏪 Shops</h3>
+      <div id="storeDialogue">Welcome to Stonewell shops! Choose a store:</div>
+      <div id="storeButtons">
+        <button id="butcherBtn">🔪 Butcher (Sell 3 Food → 1 Coin)</button>
+        <button id="blacksmithBtn">⚒️ Blacksmith (Buy 10 Arrows for 5 Coins)</button>
+        <button id="herbalistBtn">🌿 Herbalist (Sell 1 Herb for 1 Coin)</button>
+      </div>
+    </div>
+  </div>
+<body>
+  <!-- ...your HTML... -->
+
+  <script src="game.js"></script>
+</body>
+
+</html>
