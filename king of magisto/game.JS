@@ -8,26 +8,32 @@ let energy = 5;
 let arrows = 10;
 
 // UI Elements
-const dayEl = document.getElementById('day');
-const healthEl = document.getElementById('health');
-const foodEl = document.getElementById('food');
-const coinsEl = document.getElementById('coins');
-const invFoodEl = document.getElementById('invFood');
-const herbsEl = document.getElementById('herbs');
-const storyEl = document.getElementById('story');
-const energyEl = document.getElementById('energy');
-const arrowsEl = document.getElementById('arrows');
+const dayEls = document.querySelectorAll('.day');
+const healthEls = document.querySelectorAll('.health');
+const energyEls = document.querySelectorAll('.energy');
+const invFoodEls = document.querySelectorAll('.invFood');
+const herbsEls = document.querySelectorAll('.herbs');
+const arrowsEls = document.querySelectorAll('.arrows');
+const coinsEls = document.querySelectorAll('.coins');
 
-// Buttons main screen
+const storyEl = document.getElementById('story');
+
+// Buttons
 const huntBtn = document.getElementById('huntBtn');
-const checkBtn = document.getElementById('checkBtn');
+const forageBtn = document.getElementById('forageBtn');
 const restBtn = document.getElementById('restBtn');
 const logBtn = document.getElementById('logBtn');
+const exportBtn = document.getElementById('exportBtn');
+const importInput = document.getElementById('importInput');
 
 // Screens
 const mainScreen = document.getElementById('mainScreen');
 const roadScreen = document.getElementById('roadScreen');
 const townScreen = document.getElementById('townScreen');
+const butcherScreen = document.getElementById('butcherScreen');
+const blacksmithScreen = document.getElementById('blacksmithScreen');
+const herbalistScreen = document.getElementById('herbalistScreen');
+const gameOverScreen = document.getElementById('gameOverScreen');
 
 // Navigation buttons
 const goToRoadBtn = document.getElementById('goToRoadBtn');
@@ -35,68 +41,71 @@ const backToMainBtn = document.getElementById('backToMainBtn');
 const goToTownBtn = document.getElementById('goToTownBtn');
 const backToRoadBtn = document.getElementById('backToRoadBtn');
 
-// Store elements & buttons
-const storeScreen = document.getElementById('storeScreen');
-const storeDialogue = document.getElementById('storeDialogue');
-const butcherBtn = document.getElementById('butcherBtn');
-const blacksmithBtn = document.getElementById('blacksmithBtn');
-const herbalistBtn = document.getElementById('herbalistBtn');
+const butcherEnterBtn = document.getElementById('butcherEnterBtn');
+const blacksmithEnterBtn = document.getElementById('blacksmithEnterBtn');
+const herbalistEnterBtn = document.getElementById('herbalistEnterBtn');
 
-// Update UI function
+const sellFoodBtn = document.getElementById('sellFoodBtn');
+const buyArrowsBtn = document.getElementById('buyArrowsBtn');
+const sellHerbBtn = document.getElementById('sellHerbBtn');
+const sellAllHerbsBtn = document.getElementById('sellAllHerbsBtn');
+
+const backToTownBtns = document.querySelectorAll('.backToTownBtn');
+
+// Show or hide screens (updated to handle game over)
+function showScreen(screen) {
+  [mainScreen, roadScreen, townScreen, butcherScreen, blacksmithScreen, herbalistScreen, gameOverScreen].forEach(s => {
+    s.style.display = 'none';
+  });
+  screen.style.display = 'flex'; // Use 'flex' because your CSS uses flex layouts
+}
+
+// Update UI
 function updateUI() {
-  dayEl.textContent = day;
-  healthEl.textContent = health;
-  foodEl.textContent = food;
-  coinsEl.textContent = coins;
-  invFoodEl.textContent = food;
-  herbsEl.textContent = herbs;
-  energyEl.textContent = energy;
-  arrowsEl.textContent = arrows;
+  // Check for game over
+  if (health <= 0) {
+    showScreen(gameOverScreen);
+    return; // Skip rest of UI update when dead
+  }
 
-  // Disable hunt and check based on energy/arrows
+  dayEls.forEach(el => el.textContent = day);
+  healthEls.forEach(el => el.textContent = health);
+  energyEls.forEach(el => el.textContent = energy);
+
+  invFoodEls.forEach(el => el.textContent = food);
+  herbsEls.forEach(el => el.textContent = herbs);
+  arrowsEls.forEach(el => el.textContent = arrows);
+  coinsEls.forEach(el => el.textContent = coins);
+
   huntBtn.disabled = energy <= 0 || arrows <= 0;
-  checkBtn.disabled = energy <= 0;
+  forageBtn.disabled = energy <= 0;
   restBtn.disabled = energy >= 5;
 
-  // Disable store buttons if player cannot afford/sell
-  butcherBtn.disabled = food < 3;
-  blacksmithBtn.disabled = coins < 5;
-  herbalistBtn.disabled = herbs < 1;
+  sellFoodBtn.disabled = food < 3;
+  buyArrowsBtn.disabled = coins < 5;
+  sellHerbBtn.disabled = herbs < 1;
+  sellAllHerbsBtn.disabled = herbs < 1;
+
+  sellAllHerbsBtn.title = herbs < 1 ? "You have no herbs to sell." : "Sell all your herbs.";
 }
 
-// Show one screen at a time
-function showScreen(screen) {
-  mainScreen.style.display = 'none';
-  roadScreen.style.display = 'none';
-  townScreen.style.display = 'none';
-  storeScreen.style.display = 'none';
-
-  if (screen === townScreen) {
-    townScreen.style.display = 'flex';
-    storeScreen.style.display = 'flex';  // Show store inside town
-  } else {
-    screen.style.display = 'flex';
-  }
-}
-
-// Hunting logic
+// Game actions
 function hunt() {
-  if (energy <= 0 || arrows <= 0) return;
+  if (energy <= 0 || arrows <= 0 || health <= 0) return;
   arrows--;
   energy--;
   if (Math.random() < 0.8) {
     const gain = Math.floor(Math.random() * 3) + 1;
     food += gain;
-    storyEl.innerHTML = `Your arrow strikes true. You collect +${gain} food.`;
+    storyEl.textContent = `Your arrow strikes true. You collect +${gain} food.`;
   } else {
     storyEl.textContent = 'You missed your shot. The animal escapes into the trees.';
   }
   updateUI();
 }
 
-// Check surroundings logic
-function checkSurroundings() {
-  if (energy <= 0) return;
+function forage() {
+  if (energy <= 0 || health <= 0) return;
   energy--;
   const events = [
     'You find strange footprints in the mud.',
@@ -111,15 +120,12 @@ function checkSurroundings() {
   updateUI();
 }
 
-// Rest logic
 function rest() {
-  if (energy >= 5) {
+  if (energy >= 5 || health <= 0) {
     storyEl.textContent = 'You already feel rested.';
     return;
   }
-
-  day++; // Advance day
-
+  day++;
   if (food > 0) {
     food--;
     energy = 5;
@@ -130,122 +136,187 @@ function rest() {
     energy = 5;
     storyEl.textContent = 'You rest without food. It takes a toll. (-10 health, +1 day)';
   }
-
   updateUI();
 }
 
-// Story log placeholder
 function logEvent() {
   alert('Story log coming soon!');
 }
 
 // Navigation handlers
 goToRoadBtn.addEventListener('click', () => {
+  if (health <= 0) return;
   showScreen(roadScreen);
   storyEl.textContent = 'You step onto the dusty road leading away from the forest.';
 });
 
 backToMainBtn.addEventListener('click', () => {
+  if (health <= 0) return;
   showScreen(mainScreen);
   storyEl.textContent = 'You return to the peaceful wilderness clearing.';
 });
 
 goToTownBtn.addEventListener('click', () => {
+  if (health <= 0) return;
   showScreen(townScreen);
   storyEl.textContent = 'You arrive at Stonewell, a bustling town.';
 });
 
 backToRoadBtn.addEventListener('click', () => {
+  if (health <= 0) return;
   showScreen(roadScreen);
   storyEl.textContent = 'You return to the fork in the road.';
 });
 
+butcherEnterBtn.addEventListener('click', () => {
+  if (health <= 0) return;
+  showScreen(butcherScreen);
+  storyEl.textContent = 'You enter the butcher\'s shop.';
+});
 
-// Butcher: Sell 3 food for 1 coin
-butcherBtn.addEventListener('click', () => {
+blacksmithEnterBtn.addEventListener('click', () => {
+  if (health <= 0) return;
+  showScreen(blacksmithScreen);
+  storyEl.textContent = 'You enter the blacksmith\'s shop.';
+});
+
+herbalistEnterBtn.addEventListener('click', () => {
+  if (health <= 0) return;
+  showScreen(herbalistScreen);
+  storyEl.textContent = 'You enter the herbalist\'s shop.';
+});
+
+backToTownBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    if (health <= 0) return;
+    showScreen(townScreen);
+    storyEl.textContent = 'You return to the town center.';
+  });
+});
+
+// Shop actions
+sellFoodBtn.addEventListener('click', () => {
+  if (health <= 0) return;
   if (food >= 3) {
     food -= 3;
     coins += 1;
-    storeDialogue.textContent = 'Who dragged this mutt in here? You sold 3 food for 1 coin.';
+    storyEl.textContent = 'You sold 3 food to the butcher.';
     updateUI();
+  } else {
+    storyEl.textContent = 'Not enough food to sell.';
   }
 });
 
-// Blacksmith: Buy 10 arrows for 5 coins
-blacksmithBtn.addEventListener('click', () => {
+buyArrowsBtn.addEventListener('click', () => {
+  if (health <= 0) return;
   if (coins >= 5) {
     coins -= 5;
     arrows += 10;
-    storeDialogue.textContent = 'A fine set of arrows for your quiver. You bought 10 arrows for 5 coins.';
+    storyEl.textContent = 'You bought 10 arrows.';
     updateUI();
-  }
-});
-
-// Herbalist: Sell 1 herb for 1 coin
-herbalistBtn.addEventListener('click', () => {
-  if (herbs >= 1) {
-    herbs -= 1;
-    coins += 1;
-    storeDialogue.textContent = 'The herbalist accepts your herbs. You sold 1 herb for 1 coin.';
-    updateUI();
-  }
-});
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'c' || e.key === 'C') {
-    checkSurroundings();
-  }
-});
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'd' || e.key === 'd') {
-    hunt();
-  }
-});
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'r' || e.key === 'r') {
-    rest();
-  }
-});
-
-function saveGame() {
-  const gameState = {
-    day,
-    health,
-    food,
-    herbs,
-    coins,
-    energy,
-    arrows
-  };
-  localStorage.setItem('magistoSave', JSON.stringify(gameState));
-  storyEl.textContent = "💾 Game saved successfully!";
-}
-
-function loadGame() {
-  const saved = localStorage.getItem('magistoSave');
-  if (saved) {
-    const gameState = JSON.parse(saved);
-    day = gameState.day;
-    health = gameState.health;
-    food = gameState.food;
-    herbs = gameState.herbs;
-    coins = gameState.coins;
-    energy = gameState.energy;
-    arrows = gameState.arrows;
-    updateUI();
-    storyEl.textContent = "📂 Game loaded!";
   } else {
-    storyEl.textContent = "⚠️ No saved game found.";
+    storyEl.textContent = 'Not enough coins.';
   }
+});
+
+sellHerbBtn.addEventListener('click', () => {
+  if (health <= 0) return;
+  if (herbs >= 1) {
+    herbs--;
+    coins++;
+    storyEl.textContent = 'You sold 1 herb.';
+    updateUI();
+  } else {
+    storyEl.textContent = 'No herbs to sell.';
+  }
+});
+
+sellAllHerbsBtn.addEventListener('click', () => {
+  if (health <= 0) return;
+  if (herbs > 0) {
+    const earnedCoins = herbs;
+    coins += earnedCoins;
+    herbs = 0;
+    storyEl.textContent = `Sold all herbs for ${earnedCoins} coins.`;
+    updateUI();
+  } else {
+    storyEl.textContent = 'You have no herbs to sell.';
+  }
+});
+
+// Keyboard shortcuts
+document.addEventListener('keydown', (e) => {
+  if (health <= 0) return;
+  if (e.key === 'd' || e.key === 'D') hunt();
+  else if (e.key === 'f' || e.key === 'F') forage();
+  else if (e.key === 'r' || e.key === 'R') rest();
+});
+
+// Export Save
+exportBtn.addEventListener('click', () => {
+  const save = {
+    day, health, food, herbs, coins, energy, arrows
+  };
+  const blob = new Blob([JSON.stringify(save)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'magisto-save.json';
+  a.click();
+  storyEl.textContent = '📤 Save exported!';
+});
+
+// Import Save
+importInput.addEventListener('change', (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (validateSaveData(data)) {
+        day = data.day;
+        health = data.health;
+        food = data.food;
+        herbs = data.herbs;
+        coins = data.coins;
+        energy = data.energy;
+        arrows = data.arrows;
+        updateUI();
+        storyEl.textContent = '📥 Save imported!';
+      } else {
+        storyEl.textContent = '⚠️ Invalid save file.';
+      }
+    } catch (err) {
+      storyEl.textContent = '⚠️ Error reading save file.';
+    }
+  };
+  reader.readAsText(file);
+});
+
+function validateSaveData(data) {
+  return (
+    typeof data.day === 'number' &&
+    typeof data.health === 'number' &&
+    typeof data.food === 'number' &&
+    typeof data.herbs === 'number' &&
+    typeof data.coins === 'number' &&
+    typeof data.energy === 'number' &&
+    typeof data.arrows === 'number'
+  );
 }
 
-// Attach main screen buttons
+// Attach actions
 huntBtn.addEventListener('click', hunt);
-checkBtn.addEventListener('click', checkSurroundings);
+forageBtn.addEventListener('click', forage);
 restBtn.addEventListener('click', rest);
 logBtn.addEventListener('click', logEvent);
+const returnToMenuBtn = document.getElementById('returnToMenuBtn');
+returnToMenuBtn.addEventListener('click', () => {
+  window.location.href = 'index.html'; // change filename if needed
+});
 
-// Initial UI update
-updateUI();
 
-// Show main screen initially
+// Init
 showScreen(mainScreen);
+updateUI();
