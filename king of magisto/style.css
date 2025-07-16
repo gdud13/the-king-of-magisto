@@ -1,58 +1,94 @@
+/* Base Styles */
 body {
   margin: 0;
   padding: 0;
   font-family: 'IM Fell English SC', serif;
-  background: url('https://i.imgur.com/NEIXnXr.jpg') no-repeat center center fixed;
-  background-size: cover;
   color: #3b2f1d;
   font-size: 20px;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  background-color: #1a140e;
+  overflow: hidden;
 }
 
-.hud {
-  background-color: rgba(255, 248, 220, 0.85);
-  border-bottom: 2px solid #5e4b2b;
+button {
+  font-family: 'IM Fell English SC', serif;
+  background: linear-gradient(to bottom right, #d2b48c, #c1a071);
+  border: 2px solid #5e4b2b;
+  border-radius: 8px;
   padding: 10px 20px;
+  cursor: pointer;
+  color: #3b2f1d;
+  font-size: 20px;
+  transition: background 0.3s ease, transform 0.2s ease;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+button:hover:enabled {
+  background: linear-gradient(to bottom right, #e0c9a6, #d4b88a);
+  transform: scale(1.02);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.screen {
+  display: none;
+  flex-direction: column;
+  padding: 20px;
+  width: 100vw;
+  height: 100vh;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+.active {
+  display: flex;
+}
+
+/* HUD */
+.hud {
+  background-color: rgba(255, 248, 220, 0.9);
+  border-bottom: 2px solid #5e4b2b;
+  padding: 12px 24px;
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 10px;
+  box-shadow: inset 0 -1px 3px rgba(0,0,0,0.1);
 }
 
-/* Common main screen style, default hidden */
+/* Main Layout */
 .main {
   flex: 1;
-  display: none; /* hide by default */
+  display: flex;
   padding: 20px;
   gap: 20px;
-  flex-direction: row;
 }
 
-/* Show the active screen */
-.main.active-screen {
-  display: flex; /* show as flex */
+.narrative, .inventory {
+  background: rgba(255, 248, 220, 0.9);
+  border: 2px solid #5e4b2b;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
 .narrative {
   flex: 3;
-  background-color: rgba(255, 248, 220, 0.9);
-  border: 2px solid #5e4b2b;
-  border-radius: 10px;
-  padding: 20px;
   min-height: 300px;
 }
 
 .inventory {
   flex: 1;
-  background-color: rgba(255, 248, 220, 0.9);
-  border: 2px solid #5e4b2b;
-  border-radius: 10px;
-  padding: 15px;
   max-width: 300px;
 }
 
+/* Footer */
 .footer {
   background-color: rgba(255, 248, 220, 0.9);
   border-top: 2px solid #5e4b2b;
@@ -60,25 +96,89 @@ body {
   display: flex;
   justify-content: center;
   gap: 15px;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
 }
 
-button {
-  font-family: 'IM Fell English SC', serif;
-  background-color: #d2b48c;
+/* Main screen specific background */
+#mainScreen {
+  background: url('hut in the forest.jpg') no-repeat center center fixed;
+  background-size: cover;
+}
+
+/* Road Screen */
+#roadScreen {
+  background: url('backgroundroad.jpg.png') no-repeat center center;
+  background-size: cover;
+  color: white;
+  position: relative;
+}
+
+#roadScreen > * {
+  background-color: rgba(0, 0, 0, 0.6);
+  padding: 18px;
+  border-radius: 10px;
+  max-width: 650px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.4);
+}
+
+/* Town */
+#townScreen {
+  background: url('background.jpg.png') no-repeat center center;
+  background-size: cover;
+}
+
+/* Shops - flex row layout with gap */
+#butcherScreen,
+#blacksmithScreen,
+#herbalistScreen {
+  display: flex;
+  flex-direction: row;
+  padding: 40px;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 40px;
+
+  background-color: #fefae0;
+  background-image: url('parchment-bg.png'); /* Optional texture */
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+#butcherScreen img,
+#blacksmithScreen img,
+#herbalistScreen img {
+  width: 100%;
+  max-width: 700px;
   border: 2px solid #5e4b2b;
-  border-radius: 5px;
-  padding: 8px 16px;
+  border-radius: 12px;
+  box-shadow: 3px 3px 12px rgba(0,0,0,0.3);
+}
+
+/* Responsive: stack shop screens vertically on narrow viewports */
+@media (max-width: 900px) {
+  #butcherScreen,
+  #blacksmithScreen,
+  #herbalistScreen {
+    flex-direction: column;
+    padding: 20px;
+  }
+}
+.import-label {
+  display: inline-block;
+  padding: 6px 12px;
+  background: linear-gradient(135deg, #2c2c2c, #444);
+  color: #fff;
+  border: 1px solid #333;
+  border-radius: 4px;
   cursor: pointer;
-  color: #3b2f1d;
-  font-size: 20px;
-  transition: background-color 0.3s ease;
+  font-family: inherit;
+  font-size: 14px;
+  margin-left: 5px;
+  user-select: none;
+  transition: background 0.2s ease;
 }
 
-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-button:hover:enabled {
-  background-color: #e0c9a6;
+.import-label:hover {
+  background: linear-gradient(135deg, #3a3a3a, #555);
 }
