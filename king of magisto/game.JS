@@ -6,6 +6,7 @@ let herbs = 0;
 let coins = 0;
 let energy = 5;
 let arrows = 10;
+let swordOwned = false;
 
 // UI Elements
 const dayEls = document.querySelectorAll('.day');
@@ -15,6 +16,8 @@ const invFoodEls = document.querySelectorAll('.invFood');
 const herbsEls = document.querySelectorAll('.herbs');
 const arrowsEls = document.querySelectorAll('.arrows');
 const coinsEls = document.querySelectorAll('.coins');
+const buySwordBtn = document.getElementById('buySwordBtn');
+const swordOwnedEls = document.querySelectorAll('.swordOwned');
 
 const storyEl = document.getElementById('story');
 
@@ -57,15 +60,24 @@ function showScreen(screen) {
   [mainScreen, roadScreen, townScreen, butcherScreen, blacksmithScreen, herbalistScreen, gameOverScreen].forEach(s => {
     s.style.display = 'none';
   });
-  screen.style.display = 'flex'; // Use 'flex' because your CSS uses flex layouts
+  screen.style.display = 'flex'; // matches your CSS flex layout
 }
 
-// Update UI
+// Update sword-specific UI elements and button state
+function updateSwordUI() {
+  swordOwnedEls.forEach(el => el.textContent = swordOwned ? 'Yes' : 'No');
+  buySwordBtn.disabled = swordOwned || coins < 20 || health <= 0;
+  buySwordBtn.title = swordOwned
+    ? "You already own a sword."
+    : (coins < 20 ? "Not enough coins to buy a sword." : "Buy a sword for 20 coins.");
+}
+
+// Update UI elements and button states
 function updateUI() {
-  // Check for game over
+  // Handle game over screen
   if (health <= 0) {
     showScreen(gameOverScreen);
-    return; // Skip rest of UI update when dead
+    return;
   }
 
   dayEls.forEach(el => el.textContent = day);
@@ -77,36 +89,45 @@ function updateUI() {
   arrowsEls.forEach(el => el.textContent = arrows);
   coinsEls.forEach(el => el.textContent = coins);
 
-  huntBtn.disabled = energy <= 0 || arrows <= 0;
-  forageBtn.disabled = energy <= 0;
-  restBtn.disabled = energy >= 5;
+  // Disable buttons based on conditions
+  huntBtn.disabled = energy <= 0 || arrows <= 0 || health <= 0;
+  forageBtn.disabled = energy <= 0 || health <= 0;
+  restBtn.disabled = energy >= 5 || health <= 0;
 
-  sellFoodBtn.disabled = food < 3;
-  buyArrowsBtn.disabled = coins < 5;
-  sellHerbBtn.disabled = herbs < 1;
-  sellAllHerbsBtn.disabled = herbs < 1;
+  sellFoodBtn.disabled = food < 3 || health <= 0;
+  buyArrowsBtn.disabled = coins < 5 || health <= 0;
+  sellHerbBtn.disabled = herbs < 1 || health <= 0;
+  sellAllHerbsBtn.disabled = herbs < 1 || health <= 0;
 
   sellAllHerbsBtn.title = herbs < 1 ? "You have no herbs to sell." : "Sell all your herbs.";
+
+  // Update sword UI as well
+  updateSwordUI();
 }
 
-// Game actions
+// Game action: Hunt
 function hunt() {
   if (energy <= 0 || arrows <= 0 || health <= 0) return;
+
   arrows--;
   energy--;
+
   if (Math.random() < 0.8) {
     const gain = Math.floor(Math.random() * 3) + 1;
     food += gain;
-    storyEl.textContent = `Your arrow strikes true. You collect +${gain} food.`;
+    storyEl.textContent = Your arrow strikes true. You collect +${gain} food.;
   } else {
     storyEl.textContent = 'You missed your shot. The animal escapes into the trees.';
   }
   updateUI();
 }
 
+// Game action: Forage
 function forage() {
   if (energy <= 0 || health <= 0) return;
+
   energy--;
+
   const events = [
     'You find strange footprints in the mud.',
     'The wind carries the howl of wolves.',
@@ -120,12 +141,15 @@ function forage() {
   updateUI();
 }
 
+// Game action: Rest
 function rest() {
   if (energy >= 5 || health <= 0) {
     storyEl.textContent = 'You already feel rested.';
     return;
   }
+
   day++;
+
   if (food > 0) {
     food--;
     energy = 5;
@@ -139,6 +163,23 @@ function rest() {
   updateUI();
 }
 
+// Buy sword action
+function buySword() {
+  if (swordOwned) {
+    storyEl.textContent = 'You already own a sword.';
+    return;
+  }
+  if (coins < 20) {
+    storyEl.textContent = 'Not enough coins to buy a sword.';
+    return;
+  }
+  coins -= 20;
+  swordOwned = true;
+  storyEl.textContent = 'You purchased a sword! Now you can fight better.';
+  updateUI();
+}
+
+// Log event placeholder
 function logEvent() {
   alert('Story log coming soon!');
 }
@@ -199,7 +240,7 @@ sellFoodBtn.addEventListener('click', () => {
   if (health <= 0) return;
   if (food >= 3) {
     food -= 3;
-    coins += 1;
+    coins++;
     storyEl.textContent = 'You sold 3 food to the butcher.';
     updateUI();
   } else {
@@ -237,26 +278,28 @@ sellAllHerbsBtn.addEventListener('click', () => {
     const earnedCoins = herbs;
     coins += earnedCoins;
     herbs = 0;
-    storyEl.textContent = `Sold all herbs for ${earnedCoins} coins.`;
+    storyEl.textContent = Sold all herbs for ${earnedCoins} coins.;
     updateUI();
   } else {
     storyEl.textContent = 'You have no herbs to sell.';
   }
 });
 
-// Keyboard shortcuts
+// Keyboard shortcuts with focus check and lowercase normalization
 document.addEventListener('keydown', (e) => {
+  if (['INPUT', 'TEXTAREA'].includes(e.target.tagName)) return;
   if (health <= 0) return;
-  if (e.key === 'd' || e.key === 'D') hunt();
-  else if (e.key === 'f' || e.key === 'F') forage();
-  else if (e.key === 'r' || e.key === 'R') rest();
+
+  const key = e.key.toLowerCase();
+
+  if (key === 'd') hunt();
+  else if (key === 'f') forage();
+  else if (key === 'r') rest();
 });
 
 // Export Save
 exportBtn.addEventListener('click', () => {
-  const save = {
-    day, health, food, herbs, coins, energy, arrows
-  };
+  const save = { day, health, food, herbs, coins, energy, arrows, swordOwned };
   const blob = new Blob([JSON.stringify(save)], { type: 'application/json' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
@@ -282,12 +325,13 @@ importInput.addEventListener('change', (event) => {
         coins = data.coins;
         energy = data.energy;
         arrows = data.arrows;
+        swordOwned = !!data.swordOwned;
         updateUI();
         storyEl.textContent = '📥 Save imported!';
       } else {
         storyEl.textContent = '⚠️ Invalid save file.';
       }
-    } catch (err) {
+    } catch {
       storyEl.textContent = '⚠️ Error reading save file.';
     }
   };
@@ -306,16 +350,17 @@ function validateSaveData(data) {
   );
 }
 
-// Attach actions
+// Attach click handlers
 huntBtn.addEventListener('click', hunt);
 forageBtn.addEventListener('click', forage);
 restBtn.addEventListener('click', rest);
 logBtn.addEventListener('click', logEvent);
+buySwordBtn.addEventListener('click', buySword);
+
 const returnToMenuBtn = document.getElementById('returnToMenuBtn');
 returnToMenuBtn.addEventListener('click', () => {
   window.location.href = 'index.html'; // change filename if needed
 });
-
 
 // Init
 showScreen(mainScreen);
