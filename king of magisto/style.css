@@ -237,6 +237,17 @@ button[disabled],
     document.getElementById('start-btn').addEventListener('click', () => {
       window.location.href = 'game.html';
     });
+#gameOverScreen button {
+  margin-top: 1em;
+  background: linear-gradient(to bottom right, #d2b48c, #c1a071);
+  border: 2px solid #5e4b2b;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 20px;
+  color: #3b2f1d;
+  cursor: pointer;
+}
+
   </script>
 </body>
 </html>
