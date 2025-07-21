@@ -16,8 +16,6 @@ const invFoodEls = document.querySelectorAll('.invFood');
 const herbsEls = document.querySelectorAll('.herbs');
 const arrowsEls = document.querySelectorAll('.arrows');
 const coinsEls = document.querySelectorAll('.coins');
-const buySwordBtn = document.getElementById('buySwordBtn');
-const swordOwnedEls = document.querySelectorAll('.swordOwned');
 
 const storyEl = document.getElementById('story');
 
@@ -28,6 +26,7 @@ const restBtn = document.getElementById('restBtn');
 const logBtn = document.getElementById('logBtn');
 const exportBtn = document.getElementById('exportBtn');
 const importInput = document.getElementById('importInput');
+const buySwordBtn = document.getElementById('buySwordBtn');
 
 // Screens
 const mainScreen = document.getElementById('mainScreen');
@@ -55,41 +54,33 @@ const sellAllHerbsBtn = document.getElementById('sellAllHerbsBtn');
 
 const backToTownBtns = document.querySelectorAll('.backToTownBtn');
 
-// Show or hide screens (updated to handle game over)
+const returnToMenuBtn = document.getElementById('returnToMenuBtn');
+
+// Helper: Show one screen, hide all others
 function showScreen(screen) {
   [mainScreen, roadScreen, townScreen, butcherScreen, blacksmithScreen, herbalistScreen, gameOverScreen].forEach(s => {
     s.style.display = 'none';
   });
-  screen.style.display = 'flex'; // matches your CSS flex layout
+  screen.style.display = 'flex';
 }
 
-// Update sword-specific UI elements and button state
-function updateSwordUI() {
-  swordOwnedEls.forEach(el => el.textContent = swordOwned ? 'Yes' : 'No');
-  buySwordBtn.disabled = swordOwned || coins < 20 || health <= 0;
-  buySwordBtn.title = swordOwned
-    ? "You already own a sword."
-    : (coins < 20 ? "Not enough coins to buy a sword." : "Buy a sword for 20 coins.");
-}
-
-// Update UI elements and button states
+// Update UI values and button states
 function updateUI() {
-  // Handle game over screen
   if (health <= 0) {
+    // Trigger game over screen
     showScreen(gameOverScreen);
     return;
   }
 
-  dayEls.forEach(el => el.textContent = day);
-  healthEls.forEach(el => el.textContent = health);
-  energyEls.forEach(el => el.textContent = energy);
+  dayEls.forEach(el => (el.textContent = day));
+  healthEls.forEach(el => (el.textContent = health));
+  energyEls.forEach(el => (el.textContent = energy));
+  invFoodEls.forEach(el => (el.textContent = food));
+  herbsEls.forEach(el => (el.textContent = herbs));
+  arrowsEls.forEach(el => (el.textContent = arrows));
+  coinsEls.forEach(el => (el.textContent = coins));
 
-  invFoodEls.forEach(el => el.textContent = food);
-  herbsEls.forEach(el => el.textContent = herbs);
-  arrowsEls.forEach(el => el.textContent = arrows);
-  coinsEls.forEach(el => el.textContent = coins);
-
-  // Disable buttons based on conditions
+  // Buttons enable/disable logic
   huntBtn.disabled = energy <= 0 || arrows <= 0 || health <= 0;
   forageBtn.disabled = energy <= 0 || health <= 0;
   restBtn.disabled = energy >= 5 || health <= 0;
@@ -99,13 +90,15 @@ function updateUI() {
   sellHerbBtn.disabled = herbs < 1 || health <= 0;
   sellAllHerbsBtn.disabled = herbs < 1 || health <= 0;
 
-  sellAllHerbsBtn.title = herbs < 1 ? "You have no herbs to sell." : "Sell all your herbs.";
-
-  // Update sword UI as well
-  updateSwordUI();
+  buySwordBtn.disabled = swordOwned || coins < 20 || health <= 0;
+  buySwordBtn.title = swordOwned
+    ? "You already own a sword."
+    : coins < 20
+    ? "Not enough coins to buy a sword."
+    : "Buy a sword for 20 coins.";
 }
 
-// Game action: Hunt
+// Game actions
 function hunt() {
   if (energy <= 0 || arrows <= 0 || health <= 0) return;
 
@@ -115,14 +108,13 @@ function hunt() {
   if (Math.random() < 0.8) {
     const gain = Math.floor(Math.random() * 3) + 1;
     food += gain;
-    storyEl.textContent = Your arrow strikes true. You collect +${gain} food.;
+    storyEl.textContent = `Your arrow strikes true. You collect +${gain} food.`;
   } else {
     storyEl.textContent = 'You missed your shot. The animal escapes into the trees.';
   }
   updateUI();
 }
 
-// Game action: Forage
 function forage() {
   if (energy <= 0 || health <= 0) return;
 
@@ -135,13 +127,13 @@ function forage() {
     'You spot a deer in the distance.',
     'The forest seems calm, but watchful.'
   ];
+
   const idx = Math.floor(Math.random() * events.length);
   storyEl.textContent = events[idx];
   if (idx === 2) herbs++;
   updateUI();
 }
 
-// Game action: Rest
 function rest() {
   if (energy >= 5 || health <= 0) {
     storyEl.textContent = 'You already feel rested.';
@@ -179,7 +171,7 @@ function buySword() {
   updateUI();
 }
 
-// Log event placeholder
+// Placeholder for story log
 function logEvent() {
   alert('Story log coming soon!');
 }
@@ -278,14 +270,14 @@ sellAllHerbsBtn.addEventListener('click', () => {
     const earnedCoins = herbs;
     coins += earnedCoins;
     herbs = 0;
-    storyEl.textContent = Sold all herbs for ${earnedCoins} coins.;
+    storyEl.textContent = `Sold all herbs for ${earnedCoins} coins.`;
     updateUI();
   } else {
     storyEl.textContent = 'You have no herbs to sell.';
   }
 });
 
-// Keyboard shortcuts with focus check and lowercase normalization
+// Keyboard shortcuts
 document.addEventListener('keydown', (e) => {
   if (['INPUT', 'TEXTAREA'].includes(e.target.tagName)) return;
   if (health <= 0) return;
@@ -328,6 +320,7 @@ importInput.addEventListener('change', (event) => {
         swordOwned = !!data.swordOwned;
         updateUI();
         storyEl.textContent = '📥 Save imported!';
+        showScreen(mainScreen);
       } else {
         storyEl.textContent = '⚠️ Invalid save file.';
       }
@@ -350,17 +343,18 @@ function validateSaveData(data) {
   );
 }
 
-// Attach click handlers
+// Return to menu button handler (reload or redirect)
+returnToMenuBtn.addEventListener('click', () => {
+  // You can change this to your actual title screen URL or just reload
+  window.location.href = 'intro.html'; 
+});
+
+// Attach action listeners
 huntBtn.addEventListener('click', hunt);
 forageBtn.addEventListener('click', forage);
 restBtn.addEventListener('click', rest);
 logBtn.addEventListener('click', logEvent);
 buySwordBtn.addEventListener('click', buySword);
-
-const returnToMenuBtn = document.getElementById('returnToMenuBtn');
-returnToMenuBtn.addEventListener('click', () => {
-  window.location.href = 'index.html'; // change filename if needed
-});
 
 // Init
 showScreen(mainScreen);
