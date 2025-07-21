@@ -30,12 +30,20 @@ button:hover:enabled {
   transform: scale(1.02);
 }
 
-button:disabled {
+button:disabled,
+button[disabled],
+#buySwordBtn:disabled,
+#buySwordBtn[disabled],
+#sellFoodBtn:disabled,
+#buyArrowsBtn:disabled,
+#sellHerbBtn:disabled,
+#sellAllHerbsBtn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
   box-shadow: none;
 }
 
+/* Screens */
 .screen {
   display: none;
   flex-direction: column;
@@ -99,7 +107,7 @@ button:disabled {
   box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
 }
 
-/* Main screen specific background */
+/* Main screen background */
 #mainScreen {
   background: url('hut in the forest.jpg') no-repeat center center fixed;
   background-size: cover;
@@ -121,13 +129,13 @@ button:disabled {
   box-shadow: 0 0 10px rgba(0,0,0,0.4);
 }
 
-/* Town */
+/* Town Screen */
 #townScreen {
   background: url('background.jpg.png') no-repeat center center;
   background-size: cover;
 }
 
-/* Shops - flex row layout with gap */
+/* Shops */
 #butcherScreen,
 #blacksmithScreen,
 #herbalistScreen {
@@ -139,7 +147,7 @@ button:disabled {
   gap: 40px;
 
   background-color: #fefae0;
-  background-image: url('parchment-bg.png'); /* Optional texture */
+  background-image: url('parchment-bg.png');
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
@@ -155,7 +163,7 @@ button:disabled {
   box-shadow: 3px 3px 12px rgba(0,0,0,0.3);
 }
 
-/* Responsive: stack shop screens vertically on narrow viewports */
+/* Responsive shops */
 @media (max-width: 900px) {
   #butcherScreen,
   #blacksmithScreen,
@@ -164,6 +172,8 @@ button:disabled {
     padding: 20px;
   }
 }
+
+/* Import Label */
 .import-label {
   display: inline-block;
   padding: 6px 12px;
@@ -181,4 +191,117 @@ button:disabled {
 
 .import-label:hover {
   background: linear-gradient(135deg, #3a3a3a, #555);
+}
+
+/* Sword Buy Button */
+#buySwordBtn {
+  margin-top: 0.5em;
+  background-color: #8B4513;
+  color: #fff;
+  border: none;
+  padding: 0.5em 1em;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 4px;
+  font-family: 'IM Fell English SC', serif;
+  font-size: 18px;
+}
+
+#buySwordBtn:hover:enabled {
+  background-color: #a0522d;
+}
+
+#buySwordBtn:disabled {
+  background-color: #555;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Game Over Screen */
+#gameOverScreen {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  background-color: black;
+  color: white;
+  height: 100vh;
+  padding: 20px;
+}
+
+#gameOverScreen button {
+  margin-top: 1em;
+  background: linear-gradient(to bottom right, #d2b48c, #c1a071);
+  border: 2px solid #5e4b2b;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 20px;
+  color: #3b2f1d;
+  cursor: pointer;
+}
+
+/* Map Button Styles */
+#mapScreen {
+  background-color: #1a140e;
+  padding: 20px;
+  height: 100vh;
+  display: none;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.map-location-btn {
+  width: 90%;
+  max-width: 600px;
+  padding: 20px 30px;
+  font-size: 22px;
+  font-weight: 700;
+  border-radius: 12px;
+  border: 2px solid #386641;
+  cursor: pointer;
+  background: linear-gradient(to bottom right, #4caf50, #2e7d32);
+  color: #e8f5e9;
+  box-shadow: 0 4px 8px rgba(46, 125, 50, 0.7);
+  text-align: center;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.map-location-btn:hover:enabled {
+  background: linear-gradient(to bottom right, #66bb6a, #388e3c);
+  transform: scale(1.05);
+}
+
+/* Forest Screen */
+#forestScreen {
+  background: url('forest-background.jpg') no-repeat center center fixed;
+  background-size: cover;
+  color: #e8f5e9;
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  text-shadow: 0 0 5px #000;
+  height: 100vh;
+  box-sizing: border-box;
+}
+
+#forestScreen button {
+  margin: 10px 0;
+  padding: 15px 30px;
+  font-size: 22px;
+  font-weight: bold;
+  border-radius: 12px;
+  border: none;
+  background-color: #388e3c;
+  color: #e8f5e9;
+  box-shadow: 0 4px 8px rgba(0, 100, 0, 0.7);
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+#forestScreen button:hover:enabled {
+  background-color: #66bb6a;
+  transform: scale(1.05);
 }
