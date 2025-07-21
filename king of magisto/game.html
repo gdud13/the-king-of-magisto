@@ -26,7 +26,7 @@
         </div>
         <br />
         <button id="huntBtn">→ Draw your bow (D)</button>
-        <button id="forageBtn">Forage</button>
+        <button id="forageBtn">Forage (F)</button>
       </div>
 
       <div class="inventory">
@@ -39,22 +39,21 @@
       </div>
     </div>
     
-<div class="footer">
-  <button id="restBtn">🛌 Rest</button>
-  <button id="goToRoadBtn">🛣️ Go to Road</button>
-  <button disabled>🗺️ Map (Locked)</button>
-  <button id="logBtn">📖 Story Log</button>
-  <button id="exportBtn">📤 Export Save</button>
+    <div class="footer">
+      <button id="restBtn">🛌 Rest (R)</button>
+      <button id="goToRoadBtn">🛣️ Go to Road</button>
+      <button disabled>🗺️ Map (Locked)</button>
+      <button id="logBtn">📖 Story Log</button>
+      <button id="exportBtn">📤 Export Save</button>
 
-  <!-- Import file button as label -->
-  <label for="importInput" id="importLabel">📥 Import Save</label>
-  <input type="file" id="importInput" accept=".json" style="display: none;" />
-</div>
-
+      <!-- Import file button as label -->
+      <label for="importInput" class="import-label">📥 Import Save</label>
+      <input type="file" id="importInput" accept=".json" style="display: none;" />
+    </div>
   </div>
 
   <!-- Road Screen -->
-  <div id="roadScreen" class="screen" style="display:none;">
+  <div id="roadScreen" class="screen">
     <h2>🛣️ The Road</h2>
     <p>You stand at a fork in the road. One path leads to the town Stonewell.</p>
     <button id="goToTownBtn">→ Head to Stonewell</button>
@@ -62,7 +61,7 @@
   </div>
 
   <!-- Town Screen -->
-  <div id="townScreen" class="screen" style="display:none;">
+  <div id="townScreen" class="screen">
     <h2>🏘️ Stonewell Town</h2>
     <p>The town bustles with activity. Where will you go?</p>
     <button id="butcherEnterBtn">🔪 Butcher</button>
@@ -73,7 +72,7 @@
   </div>
 
   <!-- Butcher Screen -->
-  <div id="butcherScreen" class="screen" style="display:none;">
+  <div id="butcherScreen" class="screen">
     <h2>🔪 Butcher</h2>
     <img src="medieval-butcher-shop-1024x512.jpg" alt="Butcher" />
     <p>Trade 3 food for 1 coin.</p>
@@ -90,11 +89,14 @@
   </div>
 
   <!-- Blacksmith Screen -->
-  <div id="blacksmithScreen" class="screen" style="display:none;">
+  <div id="blacksmithScreen" class="screen">
     <h2>⚒️ Blacksmith</h2>
     <img src="blacksmith-shop-fantasy-world-with-enchanted-tools-glowing-forge_908344-75176.jpg" alt="Blacksmith" />
     <p>Buy 10 arrows for 5 coins.</p>
     <button id="buyArrowsBtn">Buy 10 Arrows for 5 Coins</button>
+    <p>Buy a sword for 20 coins.</p>
+    <button id="buySwordBtn">Buy Sword for 20 Coins</button>
+
     <button class="backToTownBtn">← Back to Town</button>
     <div class="inventory">
       <h3>🎒 Inventory</h3>
@@ -107,7 +109,7 @@
   </div>
 
   <!-- Herbalist Screen -->
-  <div id="herbalistScreen" class="screen" style="display:none;">
+  <div id="herbalistScreen" class="screen">
     <h2>🌿 Herbalist</h2>
     <img src="herbalist hut.jpg" alt="Herbalist" />
     <p>Sell 1 herb for 1 coin.</p>
@@ -126,13 +128,10 @@
   </div>
 
   <!-- Game Over Screen -->
-  <div id="gameOverScreen" class="screen" style="display:none; flex-direction: column; justify-content: center; align-items: center; text-align: center; background-color: black; color: white;">
-    <h1 style="font-size: 2.5em; margin-bottom: 1em;">💀 Game Over 💀</h1>
-    <p style="font-size: 1.3em;">With his vision blurring, the story of our hero ends.</p>
-    <button id="returnToMenuBtn" style="margin-top: 20px; padding: 10px 20px; font-size: 1.2em; cursor: pointer;">
-  🔁 Return to Main Menu
-</button>
-
+  <div id="gameOverScreen" class="screen">
+    <h1>💀 Game Over 💀</h1>
+    <p>With his vision blurring, the story of our hero ends.</p>
+    <button id="returnToMenuBtn">🏠 Return to Title Screen</button>
   </div>
 
   <script src="game.js"></script>
